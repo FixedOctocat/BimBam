@@ -13,6 +13,7 @@ class Settings:
         self.Details = False
         self.PackageNameCheck = False
         self.Output = "graph"
+        self.OutputDir = "apktoolFolder"
 
     def ParseArgs(self, args: argparse.Namespace):
         if not args.apk:
@@ -48,6 +49,9 @@ class Settings:
         if args.output:
             self.Output = args.output
 
+        if args.outputdir:
+            self.OutputDir = args.outputdir
+
     def InitArgparser(self):
         parser = argparse.ArgumentParser()
         parser.add_argument("apk", type=str, help="Path to APK")
@@ -79,6 +83,12 @@ class Settings:
             type=str,
             help="Output file",
         )
+        parser.add_argument(
+            "-od",
+            "--outputdir",
+            type=str,
+            help="Directory for apktool",
+        )
 
         self.ParseArgs(parser.parse_args())
 
@@ -92,6 +102,7 @@ class Settings:
             "Filter <init> functions": "True" if self.InitFunctions else "False",
             "Get detailed information": "True" if self.Details else "False",
             "Do package name check": "True" if self.PackageNameCheck else "False",
+            "Directory for apktool": self.OutputDir,
         }
 
         print("{:<30} {:<15}".format("Argument", "Value"))
