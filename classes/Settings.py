@@ -83,16 +83,15 @@ class Settings:
         self.ParseArgs(parser.parse_args())
 
     def PrintSettings(self):
-        print()
         d = {
             "APK": self.apkPath if self.apkPath else "Not specified",
-            "Draw Graph": self.Graph,
+            "Draw Graph": "True" if self.Graph else "False",
             "Main Point": self.MainPoint if self.MainPoint else "Not specified",
             "Depth": self.Depth,
-            "Recursive search": self.Recursive,
-            "Filter <init> functions": self.InitFunctions,
-            "Ouput detailed information": self.Details,
-            "Do package name check": self.PackageNameCheck,
+            "Recursive search": "True" if self.Recursive else "False",
+            "Filter <init> functions": "True" if self.InitFunctions else "False",
+            "Get detailed information": "True" if self.Details else "False",
+            "Do package name check": "True" if self.PackageNameCheck else "False",
         }
 
         print("{:<30} {:<15}".format("Argument", "Value"))
