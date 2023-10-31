@@ -20,7 +20,7 @@ class Apk:
 
     def LoadApk(self, apkFilepath):
         if os.path.isdir("apktoolFolder"):
-            c = input("apktoolFolder wil be deleted\nA you sure? [Y/n] ")
+            c = input("apktoolFolder wil be deleted\nAre you sure? [Y/n] ")
             if c.lower() != "y":
                 print("Analyzing file in apktoolFolder")
                 return 0
