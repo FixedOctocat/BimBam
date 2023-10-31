@@ -99,7 +99,7 @@ class Settings:
             "Main Point": self.MainPoint if self.MainPoint else "Not specified",
             "Depth": self.Depth,
             "Recursive search": "True" if self.Recursive else "False",
-            "Filter <init> functions": "True" if self.InitFunctions else "False",
+            "Filter <init> functions": "False" if self.InitFunctions else "True",
             "Get detailed information": "True" if self.Details else "False",
             "Do package name check": "True" if self.PackageNameCheck else "False",
             "Directory for apktool": self.OutputDir,

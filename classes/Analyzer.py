@@ -47,23 +47,18 @@ class Analyzer:
                     result[f"Function {i}"] = Detailed[i]
 
         def ClassCheck(ClassName, FuncName, StartPoint=StartPoint):
+            if not self.Settings.InitFunctions:
+                if FuncName == "<init>":
+                    return False
+
             if not self.Settings.PackageNameCheck:
                 for i in self.Apk.GetPackageName().split("."):
                     if i not in ClassName:
                         return False
 
-            if "android" in ClassName:
-                return False
-
-            if "java" in ClassName:
-                return False
-
-            if not self.Settings.InitFunctions:
-                if FuncName == "<init>":
+            for nameCheck in ["android", "java", StartPoint.split(".")[-1]]:
+                if nameCheck in ClassName:
                     return False
-
-            if StartPoint.split(".")[-1] in ClassName:
-                return False
 
             return True
 
