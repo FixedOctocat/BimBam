@@ -5,7 +5,8 @@ import argparse
 class Settings:
     def __init__(self):
         self.apkPath = None
-        self.Graph = False
+        self.FunctionsGraph = False
+        self.IntentsGraph = False
         self.MainPoint = None
         self.Depth = 6
         self.Recursive = False
@@ -25,8 +26,11 @@ class Settings:
         else:
             self.apkPath = args.apk
 
-        if args.graph:
-            self.Graph = True
+        if args.fgraph:
+            self.FunctionsGraph = True
+
+        if args.igraph:
+            self.IntentsGraph = True
 
         if args.startp:
             self.MainPoint = args.startp
@@ -56,7 +60,16 @@ class Settings:
         parser = argparse.ArgumentParser()
         parser.add_argument("apk", type=str, help="Path to APK")
         parser.add_argument(
-            "-g", "--graph", action="store_true", help="Graph view by provided APK"
+            "-fg",
+            "--fgraph",
+            action="store_true",
+            help="Function graph view by provided APK",
+        )
+        parser.add_argument(
+            "-ig",
+            "--igraph",
+            action="store_true",
+            help="Intent graph view by provided APK",
         )
         parser.add_argument("-sp", "--startp", type=str, help="Starting point")
         parser.add_argument("-d", "--depth", type=int, help="Depth of search")
@@ -95,7 +108,8 @@ class Settings:
     def PrintSettings(self):
         d = {
             "APK": self.apkPath if self.apkPath else "Not specified",
-            "Draw Graph": "True" if self.Graph else "False",
+            "Draw Functions Graph": "True" if self.FunctionsGraph else "False",
+            "Draw Intents Graph": "True" if self.IntentsGraph else "False",
             "Main Point": self.MainPoint if self.MainPoint else "Not specified",
             "Depth": self.Depth,
             "Recursive search": "True" if self.Recursive else "False",

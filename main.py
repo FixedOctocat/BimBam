@@ -10,6 +10,4 @@ if __name__ == "__main__":
     apk = Apk(ProgramSettings.apkPath)
 
     analyzer = Analyzer(apk, ProgramSettings)
-
-    if ProgramSettings.Graph:
-        analyzer.DrawClassGraph()
+    analyzer.Start()
