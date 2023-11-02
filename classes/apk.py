@@ -30,7 +30,7 @@ class Apk:
                 return 0
 
             check_call(["rm", "-r", "apktoolFolder"])
-            return 0
+
         try:
             check_call(
                 ["apktool", "d", self.apk_filepath, "-o", "apktoolFolder"],
