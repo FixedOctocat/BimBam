@@ -33,6 +33,11 @@ options:
 ```
 
 ## Output
+You can view output via 3 methods:
+- JSON array
+- JSON Crack visualization
+- pyvis graph view
+
 ```
 [
     {
