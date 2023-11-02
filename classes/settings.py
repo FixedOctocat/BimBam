@@ -22,6 +22,8 @@ class Settings:
         self.output = "graph"
         self.output_dir = "apktoolFolder"
         self.pyvis = False
+        self.exported = False
+        self.all_activities = False
 
     def parse_args(self, args: argparse.Namespace):
         """Save passed arguments from argparse to Settings class"""
@@ -68,6 +70,12 @@ class Settings:
         if args.pyvis:
             self.pyvis = args.pyvis
 
+        if args.exported:
+            self.exported = args.exported
+
+        if args.allactivities:
+            self.all_activities = args.allactivities
+
     def init_argparser(self):
         """Init argparser"""
         parser = argparse.ArgumentParser()
@@ -85,6 +93,18 @@ class Settings:
             help="Intent graph view by provided APK",
         )
         parser.add_argument("-sp", "--startp", type=str, help="Starting point")
+        parser.add_argument(
+            "-e",
+            "--exported",
+            action="store_true",
+            help="Analyze exported activities",
+        )
+        parser.add_argument(
+            "-a",
+            "--allactivities",
+            action="store_true",
+            help="Analyze all activities",
+        )
         parser.add_argument("-d", "--depth", type=int, help="depth of search")
         parser.add_argument(
             "-r", "--rec", action="store_true", help="output function recursively"
@@ -130,6 +150,8 @@ class Settings:
             "Draw Functions Graph": "True" if self.functions_graph else "False",
             "Draw Intents Graph": "True" if self.intents_graph else "False",
             "Main Point": self.main_point if self.main_point else "Not specified",
+            "Analyze exported activities": "True" if self.intents_graph else "False",
+            "Analyze all activities": "True" if self.intents_graph else "False",
             "depth": self.depth,
             "recursive search": "True" if self.recursive else "False",
             "Filter <init> functions": "False" if self.init_functions else "True",
