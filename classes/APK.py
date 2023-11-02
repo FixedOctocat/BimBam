@@ -50,7 +50,7 @@ class Apk:
         self.package_name = package_name.group(1) if package_name else None
 
         mainactivity_name = re.search(
-            rf'android:name="({self.package_name}[a-zA-Z0-9.]*MainActivity)"',
+            rf'android:name="({self.package_name}[a-zA-Z0-9_$.]*MainActivity)"',
             android_manifest,
         )
         self.mainactivity_name = mainactivity_name.group(1) if package_name else None
