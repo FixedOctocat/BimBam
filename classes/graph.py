@@ -19,10 +19,10 @@ class Graph:
         if [node1, node2] not in [[i["from"], i["to"]] for i in self.net.get_edges()]:
             self.net.add_edge(node1, node2)
 
-    def add_node(self, node: str, level: int):
+    def add_node(self, node: str, level: int, color: str = "#97c2fc"):
         """Create node"""
         if node not in self.net.get_nodes():
-            self.net.add_node(node, shape="box", level=level)
+            self.net.add_node(node, shape="box", level=level, color=color)
 
     def show(self):
         """Show graph"""
