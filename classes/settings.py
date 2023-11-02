@@ -18,12 +18,13 @@ class Settings:
         self.recursive = False
         self.init_functions = False
         self.details = False
-        self.package_name_check = False
+        self.package_name_check = True
         self.output = "graph"
         self.output_dir = "apktoolFolder"
         self.pyvis = False
         self.exported = False
         self.all_activities = False
+        self.system_name_check = True
 
     def parse_args(self, args: argparse.Namespace):
         """Save passed arguments from argparse to Settings class"""
@@ -58,7 +59,7 @@ class Settings:
         if args.details:
             self.details = args.details
 
-        if args.pnc:
+        if not args.pnc:
             self.package_name_check = args.pnc
 
         if args.output:
@@ -75,6 +76,9 @@ class Settings:
 
         if args.allactivities:
             self.all_activities = args.allactivities
+
+        if not args.snc:
+            self.system_name_check = args.snc
 
     def init_argparser(self):
         """Init argparser"""
@@ -105,9 +109,9 @@ class Settings:
             action="store_true",
             help="Analyze all activities",
         )
-        parser.add_argument("-d", "--depth", type=int, help="depth of search")
+        parser.add_argument("-d", "--depth", type=int, help="Depth of search")
         parser.add_argument(
-            "-r", "--rec", action="store_true", help="output function recursively"
+            "-r", "--rec", action="store_true", help="Output function recursively"
         )
         parser.add_argument(
             "-if",
@@ -120,14 +124,19 @@ class Settings:
         )
         parser.add_argument(
             "-pnc",
-            action="store_true",
+            action="store_false",
             help="Do package name check for all calls",
+        )
+        parser.add_argument(
+            "-snc",
+            action="store_false",
+            help="Filter all system classes for calls",
         )
         parser.add_argument(
             "-o",
             "--output",
             type=str,
-            help="output file",
+            help="Output file",
         )
         parser.add_argument(
             "-od",
@@ -150,13 +159,14 @@ class Settings:
             "Draw Functions Graph": "True" if self.functions_graph else "False",
             "Draw Intents Graph": "True" if self.intents_graph else "False",
             "Main Point": self.main_point if self.main_point else "Not specified",
-            "Analyze exported activities": "True" if self.intents_graph else "False",
-            "Analyze all activities": "True" if self.intents_graph else "False",
-            "depth": self.depth,
-            "recursive search": "True" if self.recursive else "False",
+            "Analyze exported activities": "True" if self.exported else "False",
+            "Analyze all activities": "True" if self.all_activities else "False",
+            "Depth": self.depth,
+            "Recursive search": "True" if self.recursive else "False",
             "Filter <init> functions": "False" if self.init_functions else "True",
             "Get detailed information": "True" if self.details else "False",
             "Do package name check": "True" if self.package_name_check else "False",
+            "Do system name check": "True" if self.system_name_check else "False",
             "Directory for apktool": self.output_dir,
         }
 

@@ -24,14 +24,18 @@ class Analyzer:
             if func_name == "<init>":
                 return False
 
-        if not self.settings.package_name_check:
+        if self.settings.package_name_check:
             for i in self.apk.package_name.split("."):
                 if i not in class_name:
                     return False
 
-        for name_check in ["android", "java", start_point.split(".")[-1]]:
-            if name_check in class_name:
-                return False
+        if self.settings.system_name_check:
+            for name_check in ["android", "java"]:
+                if name_check in class_name:
+                    return False
+
+        if start_point.split(".")[-1] in class_name:
+            return False
 
         return True
 
@@ -45,7 +49,7 @@ class Analyzer:
     ) -> dict:
         """Search function calls"""
         result = {
-            "Name": "",
+            "Name": f"{start_point.split('.')[-1]}",
             "members": "",
         }
 
@@ -84,45 +88,51 @@ class Analyzer:
             for dir in glob(
                 f"apktoolFolder/smali*/{'/'.join(start_point.split('.')[:-1])}"
             )
-        ][0]
-
-        first_point = open(
-            f"{activity_folder}/{start_point.split('.')[-1]}.smali",
-            "r",
-            encoding="utf-8",
-        ).read()
-
-        function_calls_from_fp = re.findall(
-            r"L([a-zA-Z0-9$\/<>]*);->([a-zA-Z0-9$\/<>]*)\(([a-zA-Z0-9$\/<>;\[\]]*)\)([a-zA-Z0-9$\/<>]*)",
-            first_point,
-        )
-
-        after_entry_points = list(
-            set(
-                [
-                    i[0].replace("/", ".")
-                    for i in function_calls_from_fp
-                    if self.class_check(
-                        class_name=i[0], func_name=i[1], start_point=start_point
-                    )
-                ]
-            )
-        )
+        ]
 
         members_of_ep = []
-        if after_entry_points:
-            for i in after_entry_points:
-                ep = self.function_search(
-                    i,
-                    depth_number=depth_number + 1,
-                    analyzed_class=analyzed_class,
-                    previous_function_calls=previous_function_calls,
+        if activity_folder:
+            activity_folder = activity_folder[0]
+            try:
+                first_point = open(
+                    f"{activity_folder}/{start_point.split('.')[-1]}.smali",
+                    "r",
+                    encoding="utf-8",
+                ).read()
+            except FileNotFoundError:
+                print("Can't find class")
+                result["members"] = members_of_ep
+                return result
+
+            function_calls_from_fp = re.findall(
+                r"L([a-zA-Z0-9$\/<>]*);->([a-zA-Z0-9$\/<>]*)\(([a-zA-Z0-9$\/<>;\[\]]*)\)([a-zA-Z0-9$\/<>]*)",
+                first_point,
+            )
+
+            after_entry_points = list(
+                set(
+                    [
+                        i[0].replace("/", ".")
+                        for i in function_calls_from_fp
+                        if self.class_check(
+                            class_name=i[0], func_name=i[1], start_point=start_point
+                        )
+                    ]
                 )
+            )
 
-                if ep:
-                    members_of_ep.append(ep)
+            if after_entry_points:
+                for i in after_entry_points:
+                    ep = self.function_search(
+                        i,
+                        depth_number=depth_number + 1,
+                        analyzed_class=analyzed_class,
+                        previous_function_calls=previous_function_calls,
+                    )
 
-        result["Name"] = f"{start_point.split('.')[-1]}"
+                    if ep:
+                        members_of_ep.append(ep)
+
         result["members"] = members_of_ep
 
         return result
@@ -201,24 +211,33 @@ class Analyzer:
 
     def start(self, data: dict = None):
         """Start analyzing apk"""
+        activities = [self.apk.mainactivity_name]
+        if self.settings.all_activities:
+            activities += self.apk.other_activities + self.apk.exported_activities
+        elif self.settings.exported:
+            activities += self.apk.exported_activities
+
+        data = []
         if self.settings.functions_graph:
-            data = self.function_search(
-                self.settings.main_point
-                if self.settings.main_point
-                else self.apk.mainactivity_name,
-                depth_number=0,
-                analyzed_class=[],
-                previous_function_calls=[],
-            )
+            for activity in activities:
+                data.append(
+                    self.function_search(
+                        activity,
+                        depth_number=0,
+                        analyzed_class=[],
+                        previous_function_calls=[],
+                    )
+                )
 
         if self.settings.intents_graph:
-            data = self.intent_search(
-                self.settings.main_point
-                if self.settings.main_point
-                else self.apk.mainactivity_name,
-                depth_number=0,
-                analyzed_class=[],
-            )
+            for activity in activities:
+                data.append(
+                    self.intent_search(
+                        activity,
+                        depth_number=0,
+                        analyzed_class=[],
+                    )
+                )
 
         if data:
             with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:

@@ -15,5 +15,5 @@ if __name__ == "__main__":
     AnalyzerTool.start()
     if ProgramSettings.pyvis:
         MainGraph = Graph(f"{ProgramSettings.output}.json")
-        MainGraph.draw()
+        MainGraph.start()
         MainGraph.show()

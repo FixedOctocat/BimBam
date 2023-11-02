@@ -53,14 +53,19 @@ class Apk:
             rf'android:name="({self.package_name}[a-zA-Z0-9_$.]*MainActivity)"',
             android_manifest,
         )
-        self.mainactivity_name = mainactivity_name.group(1) if package_name else None
+        self.mainactivity_name = (
+            mainactivity_name.group(1) if mainactivity_name else None
+        )
 
         all_activities = re.findall(r"<activity.*>", android_manifest)
         for activity in all_activities:
             activity_name = re.search(
                 r'android:name="([a-zA-Z0-9_$.]*)"', activity
             ).group(1)
+
             if 'android:exported="true"' in activity:
                 self.exported_activities.append(activity_name)
             else:
                 self.other_activities.append(activity_name)
+
+        self.other_activities.remove(self.mainactivity_name)

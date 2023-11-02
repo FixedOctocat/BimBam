@@ -10,7 +10,7 @@ class Graph:
     """Graph class for storing and drawing graphs"""
 
     def __init__(self, json_file: str):
-        self.net = Network(directed=True, select_menu=True, layout=True)
+        self.net = Network(directed=True, select_menu=True)
         with open(json_file, "r", encoding="utf8") as file:
             self.data = json.load(file)
 
@@ -22,18 +22,14 @@ class Graph:
     def add_node(self, node: str, level: int):
         """Create node"""
         if node not in self.net.get_nodes():
-            self.net.add_node(node, shape="box", physics=False, level=level)
+            self.net.add_node(node, shape="box", level=level)
 
     def show(self):
         """Show graph"""
-        self.net.force_atlas_2based()
         self.net.show("nodes.html", notebook=False)
 
     def draw(self, start_point: json = None, level: int = 0):
-        """Start to analyze json file"""
-        if start_point is None:
-            start_point = self.data
-
+        """Get json to analyze and draw graph"""
         self.add_node(start_point["Name"], level=level)
         for activity_name in start_point["members"]:
             self.add_node(activity_name["Name"], level=level + 1)
@@ -42,3 +38,11 @@ class Graph:
         if start_point["members"]:
             for member in start_point["members"]:
                 self.draw(member, level + 1)
+
+    def start(self, start_points: json = None):
+        """Start analyze json graph"""
+        if start_points is None:
+            start_points = self.data
+
+        for start_point in start_points:
+            self.draw(start_point)
