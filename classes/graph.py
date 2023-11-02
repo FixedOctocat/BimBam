@@ -10,7 +10,7 @@ class Graph:
     """Graph class for storing and drawing graphs"""
 
     def __init__(self, json_file: str):
-        self.net = Network(directed=True, select_menu=True)
+        self.net = Network(directed=True, select_menu=True, layout=False)
         with open(json_file, "r", encoding="utf8") as file:
             self.data = json.load(file)
 
@@ -26,18 +26,21 @@ class Graph:
 
     def show(self):
         """Show graph"""
+        self.net.toggle_physics(True)
         self.net.show("nodes.html", notebook=False)
 
     def draw(self, start_point: json = None, level: int = 0):
         """Get json to analyze and draw graph"""
-        self.add_node(start_point["Name"], level=level)
-        for activity_name in start_point["members"]:
-            self.add_node(activity_name["Name"], level=level + 1)
-            self.add_connection(start_point["Name"], activity_name["Name"])
 
         if start_point["members"]:
-            for member in start_point["members"]:
-                self.draw(member, level + 1)
+            self.add_node(start_point["Name"], level=level)
+            for activity_name in start_point["members"]:
+                self.add_node(activity_name["Name"], level=level + 1)
+                self.add_connection(start_point["Name"], activity_name["Name"])
+
+            if start_point["members"]:
+                for member in start_point["members"]:
+                    self.draw(member, level + 1)
 
     def start(self, start_points: json = None):
         """Start analyze json graph"""
