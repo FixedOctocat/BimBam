@@ -199,7 +199,7 @@ class Analyzer:
 
         return data
 
-    def start(self):
+    def start(self, data: dict = None):
         """Start analyzing apk"""
         if self.settings.functions_graph:
             data = self.function_search(
@@ -220,5 +220,6 @@ class Analyzer:
                 analyzed_class=[],
             )
 
-        with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
+        if data:
+            with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:
+                json.dump(data, f, ensure_ascii=False, indent=4)

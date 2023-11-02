@@ -26,9 +26,7 @@ class Graph:
 
     def show(self):
         """Show graph"""
-        self.net.force_atlas_2based(spring_length=100000)
-        self.net.options.layout.set_separation(100)
-        self.net.options.layout.set_tree_spacing(600)
+        self.net.force_atlas_2based()
         self.net.show("nodes.html", notebook=False)
 
     def draw(self, start_point: json = None, level: int = 0):

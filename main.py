@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     AnalyzerTool = Analyzer(ApkFile, ProgramSettings)
     AnalyzerTool.start()
-
-    MainGraph = Graph("graph.json")
-    MainGraph.draw()
-    MainGraph.show()
+    if ProgramSettings.pyvis:
+        MainGraph = Graph(f"{ProgramSettings.output}.json")
+        MainGraph.draw()
+        MainGraph.show()

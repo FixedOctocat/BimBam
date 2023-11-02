@@ -21,6 +21,7 @@ class Settings:
         self.package_name_check = False
         self.output = "graph"
         self.output_dir = "apktoolFolder"
+        self.pyvis = False
 
     def parse_args(self, args: argparse.Namespace):
         """Save passed arguments from argparse to Settings class"""
@@ -63,6 +64,9 @@ class Settings:
 
         if args.output_dir:
             self.output_dir = args.output_dir
+
+        if args.pyvis:
+            self.pyvis = args.pyvis
 
     def init_argparser(self):
         """Init argparser"""
@@ -110,6 +114,11 @@ class Settings:
             "--output_dir",
             type=str,
             help="Directory for apktool",
+        )
+        parser.add_argument(
+            "--pyvis",
+            action="store_true",
+            help="Generate interactive graph",
         )
 
         self.parse_args(parser.parse_args())
