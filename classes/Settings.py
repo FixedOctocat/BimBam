@@ -1,62 +1,71 @@
+"""
+os for file checking
+argparse for parsing arguments
+"""
 import os
 import argparse
 
 
 class Settings:
-    def __init__(self):
-        self.apkPath = None
-        self.FunctionsGraph = False
-        self.IntentsGraph = False
-        self.MainPoint = None
-        self.Depth = 6
-        self.Recursive = False
-        self.InitFunctions = False
-        self.Details = False
-        self.PackageNameCheck = False
-        self.Output = "graph"
-        self.OutputDir = "apktoolFolder"
+    """Class representing a settings from argparse"""
 
-    def ParseArgs(self, args: argparse.Namespace):
+    def __init__(self):
+        self.apk_path = None
+        self.functions_graph = False
+        self.intents_graph = False
+        self.main_point = None
+        self.depth = 6
+        self.recursive = False
+        self.init_functions = False
+        self.details = False
+        self.package_name_check = False
+        self.output = "graph"
+        self.output_dir = "apktoolFolder"
+
+    def parse_args(self, args: argparse.Namespace):
+        """Save passed arguments from argparse to Settings class"""
         if not args.apk:
             print("Provide path to APK")
-            return 1
-        elif not os.path.isfile(args.apk):
+            os._exit(1)
+
+        if not os.path.isfile(args.apk):
             print(f"Can't get file, check path: {args.apk}")
-            return 1
-        else:
-            self.apkPath = args.apk
+            os._exit(1)
+
+        self.apk_path = args.apk
 
         if args.fgraph:
-            self.FunctionsGraph = True
+            self.functions_graph = args.fgraph
 
         if args.igraph:
-            self.IntentsGraph = True
+            self.intents_graph = True
 
         if args.startp:
-            self.MainPoint = args.startp
+            self.main_point = args.startp
 
         if args.depth:
-            self.Depth = args.depth
+            self.depth = args.depth
 
         if args.rec:
-            self.Recursive = args.rec
+            self.recursive = args.rec
 
         if args.initfunc:
-            self.InitFunctions = args.initfunc
+            self.init_functions = args.initfunc
 
         if args.details:
-            self.Details = args.details
+            self.details = args.details
 
         if args.pnc:
-            self.PackageNameCheck = args.pnc
+            self.package_name_check = args.pnc
 
         if args.output:
-            self.Output = args.output
+            self.output = args.output
 
-        if args.outputdir:
-            self.OutputDir = args.outputdir
+        if args.output_dir:
+            self.output_dir = args.output_dir
 
-    def InitArgparser(self):
+    def init_argparser(self):
+        """Init argparser"""
         parser = argparse.ArgumentParser()
         parser.add_argument("apk", type=str, help="Path to APK")
         parser.add_argument(
@@ -72,15 +81,15 @@ class Settings:
             help="Intent graph view by provided APK",
         )
         parser.add_argument("-sp", "--startp", type=str, help="Starting point")
-        parser.add_argument("-d", "--depth", type=int, help="Depth of search")
+        parser.add_argument("-d", "--depth", type=int, help="depth of search")
         parser.add_argument(
-            "-r", "--rec", action="store_true", help="Output function recursively"
+            "-r", "--rec", action="store_true", help="output function recursively"
         )
         parser.add_argument(
             "-if",
             "--initfunc",
             action="store_true",
-            help="Output <init> functions",
+            help="output <init> functions",
         )
         parser.add_argument(
             "-det", "--details", action="store_true", help="Get detailed view"
@@ -94,29 +103,30 @@ class Settings:
             "-o",
             "--output",
             type=str,
-            help="Output file",
+            help="output file",
         )
         parser.add_argument(
             "-od",
-            "--outputdir",
+            "--output_dir",
             type=str,
             help="Directory for apktool",
         )
 
-        self.ParseArgs(parser.parse_args())
+        self.parse_args(parser.parse_args())
 
-    def PrintSettings(self):
+    def print_settings(self):
+        """Print settings in table format"""
         d = {
-            "APK": self.apkPath if self.apkPath else "Not specified",
-            "Draw Functions Graph": "True" if self.FunctionsGraph else "False",
-            "Draw Intents Graph": "True" if self.IntentsGraph else "False",
-            "Main Point": self.MainPoint if self.MainPoint else "Not specified",
-            "Depth": self.Depth,
-            "Recursive search": "True" if self.Recursive else "False",
-            "Filter <init> functions": "False" if self.InitFunctions else "True",
-            "Get detailed information": "True" if self.Details else "False",
-            "Do package name check": "True" if self.PackageNameCheck else "False",
-            "Directory for apktool": self.OutputDir,
+            "APK": self.apk_path if self.apk_path else "Not specified",
+            "Draw Functions Graph": "True" if self.functions_graph else "False",
+            "Draw Intents Graph": "True" if self.intents_graph else "False",
+            "Main Point": self.main_point if self.main_point else "Not specified",
+            "depth": self.depth,
+            "recursive search": "True" if self.recursive else "False",
+            "Filter <init> functions": "False" if self.init_functions else "True",
+            "Get detailed information": "True" if self.details else "False",
+            "Do package name check": "True" if self.package_name_check else "False",
+            "Directory for apktool": self.output_dir,
         }
 
         print("{:<30} {:<15}".format("Argument", "Value"))

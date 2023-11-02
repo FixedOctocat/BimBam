@@ -1,18 +1,19 @@
-from classes.APK import Apk
-from classes.Settings import Settings
-from classes.Analyzer import Analyzer
-from classes.Graph import Graph
+"""Import classes"""
+from classes.apk import Apk
+from classes.settings import Settings
+from classes.analyzer import Analyzer
+from classes.graph import Graph
 
 if __name__ == "__main__":
     ProgramSettings = Settings()
-    ProgramSettings.InitArgparser()
-    ProgramSettings.PrintSettings()
+    ProgramSettings.init_argparser()
+    ProgramSettings.print_settings()
 
-    ApkFile = Apk(ProgramSettings.apkPath)
+    ApkFile = Apk(ProgramSettings.apk_path)
 
     AnalyzerTool = Analyzer(ApkFile, ProgramSettings)
-    AnalyzerTool.Start()
+    AnalyzerTool.start()
 
     MainGraph = Graph("graph.json")
-    MainGraph.Draw()
-    MainGraph.Show()
+    MainGraph.draw()
+    MainGraph.show()

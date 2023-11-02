@@ -1,37 +1,46 @@
-from pyvis.network import Network
+"""
+json for reading file
+pyvis for visualizasion
+"""
 import json
+from pyvis.network import Network
 
 
 class Graph:
-    __slots__ = ["net", "data"]
+    """Graph class for storing and drawing graphs"""
 
     def __init__(self, json_file: str):
         self.net = Network(directed=True, select_menu=True, layout=True)
-        f = open(json_file)
-        self.data = json.load(f)
-        f.close()
+        with open(json_file, "r", encoding="utf8") as file:
+            self.data = json.load(file)
 
-    def AddConnection(self, node1: str, node2: str):
+    def add_connection(self, node1: str, node2: str):
+        """Create connection between two nodes"""
         if [node1, node2] not in [[i["from"], i["to"]] for i in self.net.get_edges()]:
             self.net.add_edge(node1, node2)
 
-    def AddNode(self, node: str, level: int):
+    def add_node(self, node: str, level: int):
+        """Create node"""
         if node not in self.net.get_nodes():
-            self.net.add_node(node, shape="ellipse", physics=False, level=level)
+            self.net.add_node(node, shape="box", physics=False, level=level)
 
-    def Show(self):
-        self.net.force_atlas_2based()
+    def show(self):
+        """Show graph"""
+        self.net.force_atlas_2based(spring_length=100000)
+        self.net.options.layout.set_separation(100)
+        self.net.options.layout.set_tree_spacing(600)
         self.net.show("nodes.html", notebook=False)
 
-    def Draw(self, StartPoint: json = None, level: int = 0):
-        if StartPoint is None:
-            StartPoint = self.data
+    def draw(self, start_point: json = None, level: int = 0):
+        """Start to analyze json file"""
+        if start_point is None:
+            start_point = self.data
 
-        self.AddNode(StartPoint["Name"], level=level)
-        for ActivityName in StartPoint["members"]:
-            self.AddNode(ActivityName["Name"], level=level + 1)
-            self.AddConnection(StartPoint["Name"], ActivityName["Name"])
+        self.add_node(start_point["Name"], level=level)
+        for activity_name in start_point["members"]:
+            self.add_node(activity_name["Name"], level=level + 1)
+            self.add_connection(start_point["Name"], activity_name["Name"])
 
-        if StartPoint["members"]:
-            for member in StartPoint["members"]:
-                self.Draw(member, level + 1)
+        if start_point["members"]:
+            for member in start_point["members"]:
+                self.draw(member, level + 1)

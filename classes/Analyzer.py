@@ -1,194 +1,224 @@
+"""
+re for pattern searching in smali code (intents, functions)
+json for dict dumping
+glob for directory recursive search
+"""
+
 import re
 import json
 from glob import glob
 
 
 class Analyzer:
-    def __init__(self, Apk, Settings):
-        self.Apk = Apk
-        self.Settings = Settings
+    """Class for smali code analyze"""
 
-    def ClassCheck(self, ClassName, FuncName=None, StartPoint=None):
-        if not self.Settings.InitFunctions:
-            if FuncName == "<init>":
+    def __init__(self, apk, settings):
+        self.apk = apk
+        self.settings = settings
+
+    def class_check(
+        self, class_name: str, func_name: str = None, start_point: str = None
+    ):
+        """Funtion for class name (and function name) checks"""
+        if not self.settings.init_functions:
+            if func_name == "<init>":
                 return False
 
-        if not self.Settings.PackageNameCheck:
-            for i in self.Apk.GetPackageName().split("."):
-                if i not in ClassName:
+        if not self.settings.package_name_check:
+            for i in self.apk.package_name.split("."):
+                if i not in class_name:
                     return False
 
-        for nameCheck in ["android", "java", StartPoint.split(".")[-1]]:
-            if nameCheck in ClassName:
+        for name_check in ["android", "java", start_point.split(".")[-1]]:
+            if name_check in class_name:
                 return False
 
         return True
 
     # EntryPoints Search
-    def FunctionSearch(
-        self, StartPoint=None, DepthNumber=0, AnalyzedClass=[], PreviousFunctionCalls=[]
-    ):
+    def function_search(
+        self,
+        start_point: str = None,
+        depth_number: int = 0,
+        analyzed_class: list = None,
+        previous_function_calls: list = None,
+    ) -> dict:
+        """Search function calls"""
         result = {
             "Name": "",
             "members": "",
         }
 
-        if not self.Settings.Recursive:
-            if StartPoint in AnalyzedClass:
+        if not self.settings.recursive:
+            if start_point in analyzed_class:
                 return []
-            AnalyzedClass.append(StartPoint)
+            analyzed_class.append(start_point)
 
-        if DepthNumber == self.Settings.Depth:
+        if depth_number == self.settings.depth:
             return []
 
-        if self.Settings.Details:
-            Detailed = list(
+        if self.settings.details:
+            detailed = list(
                 set(
                     [
                         FunctionCallFromFP
-                        for FunctionCallFromFP in PreviousFunctionCalls
-                        if StartPoint.split(".")[-1] in FunctionCallFromFP[0]
+                        for FunctionCallFromFP in previous_function_calls
+                        if start_point.split(".")[-1] in FunctionCallFromFP[0]
                     ]
                 )
             )
 
-            if not self.Settings.InitFunctions:
-                Detailed = [
+            if not self.settings.init_functions:
+                detailed = [
                     f"{FunctionCallFromFP[1]}({FunctionCallFromFP[2]}){FunctionCallFromFP[3]}"
-                    for FunctionCallFromFP in Detailed
+                    for FunctionCallFromFP in detailed
                     if FunctionCallFromFP[1] != "<init>"
                 ]
 
-            if Detailed:
-                for i in range(len(Detailed)):
-                    result[f"Function {i}"] = Detailed[i]
+            if detailed:
+                for i, details in enumerate(detailed):
+                    result[f"Function {i}"] = details
 
-        ActivityFolder = [
+        activity_folder = [
             dir
             for dir in glob(
-                f"apktoolFolder/smali*/{'/'.join(StartPoint.split('.')[:-1])}"
+                f"apktoolFolder/smali*/{'/'.join(start_point.split('.')[:-1])}"
             )
         ][0]
 
-        FirstPoint = open(
-            f"{ActivityFolder}/{StartPoint.split('.')[-1]}.smali", "r"
+        first_point = open(
+            f"{activity_folder}/{start_point.split('.')[-1]}.smali",
+            "r",
+            encoding="utf-8",
         ).read()
 
-        FunctionCallsFromFP = re.findall(
-            "L([a-zA-Z0-9$\/<>]*);->([a-zA-Z0-9$\/<>]*)\(([a-zA-Z0-9$\/<>;\[\]]*)\)([a-zA-Z0-9$\/<>]*)",
-            FirstPoint,
+        function_calls_from_fp = re.findall(
+            r"L([a-zA-Z0-9$\/<>]*);->([a-zA-Z0-9$\/<>]*)\(([a-zA-Z0-9$\/<>;\[\]]*)\)([a-zA-Z0-9$\/<>]*)",
+            first_point,
         )
 
-        AfterEntryPoints = list(
+        after_entry_points = list(
             set(
                 [
                     i[0].replace("/", ".")
-                    for i in FunctionCallsFromFP
-                    if self.ClassCheck(
-                        ClassName=i[0], FuncName=i[1], StartPoint=StartPoint
+                    for i in function_calls_from_fp
+                    if self.class_check(
+                        class_name=i[0], func_name=i[1], start_point=start_point
                     )
                 ]
             )
         )
 
-        MembersOfEP = []
-        if len(AfterEntryPoints):
-            for i in AfterEntryPoints:
-                EP = self.FunctionSearch(
+        members_of_ep = []
+        if after_entry_points:
+            for i in after_entry_points:
+                ep = self.function_search(
                     i,
-                    DepthNumber=DepthNumber + 1,
-                    AnalyzedClass=AnalyzedClass,
-                    PreviousFunctionCalls=FunctionCallsFromFP,
+                    depth_number=depth_number + 1,
+                    analyzed_class=analyzed_class,
+                    previous_function_calls=previous_function_calls,
                 )
 
-                if EP:
-                    MembersOfEP.append(EP)
+                if ep:
+                    members_of_ep.append(ep)
 
-        result["Name"] = f"{StartPoint.split('.')[-1]}"
-        result["members"] = MembersOfEP
+        result["Name"] = f"{start_point.split('.')[-1]}"
+        result["members"] = members_of_ep
 
         return result
 
     # Search for intents
-    def IntentSearch(
-        self, StartPoint=None, DepthNumber=0, AnalyzedClass=[], PreviousFunctionCalls=[]
-    ):
+    def intent_search(
+        self,
+        start_point: str = None,
+        depth_number: int = 0,
+        analyzed_class: list = None,
+    ) -> dict:
+        """Intent search in activities"""
         result = {
             "Name": "",
             "members": "",
         }
 
-        if not self.Settings.Recursive:
-            if StartPoint in AnalyzedClass:
+        if not self.settings.recursive:
+            if start_point in analyzed_class:
                 return []
-            AnalyzedClass.append(StartPoint)
+            analyzed_class.append(start_point)
 
-        if DepthNumber == self.Settings.Depth:
+        if depth_number == self.settings.depth:
             return []
 
-        ActivityFolder = [
+        activity_folder = [
             dir
             for dir in glob(
-                f"apktoolFolder/smali*/{'/'.join(StartPoint.split('.')[:-1])}"
+                f"apktoolFolder/smali*/{'/'.join(start_point.split('.')[:-1])}"
             )
         ][0]
 
-        FirstPoint = open(
-            f"{ActivityFolder}/{StartPoint.split('.')[-1]}.smali", "r"
+        first_point = open(
+            f"{activity_folder}/{start_point.split('.')[-1]}.smali",
+            "r",
+            encoding="utf-8",
         ).read()
 
-        FunctionCallsFromFP = re.findall(
-            """const-class .*, L(.*);\n\n    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
-            FirstPoint,
+        function_calls_from_fp = re.findall(
+            r"""const-class .*, L(.*);\n\n    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
+            first_point,
         )
 
-        AfterEntryPoints = [
+        after_entry_points = [
             i.replace("/", ".")
-            for i in FunctionCallsFromFP
-            if self.ClassCheck(ClassName=i, StartPoint=StartPoint)
+            for i in function_calls_from_fp
+            if self.class_check(class_name=i, start_point=start_point)
         ]
 
-        MembersOfEP = []
-        if len(AfterEntryPoints):
-            for i in AfterEntryPoints:
-                EP = self.IntentSearch(
+        members_of_ep = []
+        if after_entry_points:
+            for i in after_entry_points:
+                ep = self.intent_search(
                     i,
-                    DepthNumber=DepthNumber + 1,
-                    AnalyzedClass=AnalyzedClass,
-                    PreviousFunctionCalls=FunctionCallsFromFP,
+                    depth_number=depth_number + 1,
+                    analyzed_class=analyzed_class,
                 )
 
-                if EP:
-                    MembersOfEP.append(EP)
+                if ep:
+                    members_of_ep.append(ep)
 
-        result["Name"] = f"{StartPoint.split('.')[-1]}"
-        result["members"] = MembersOfEP
+        result["Name"] = f"{start_point.split('.')[-1]}"
+        result["members"] = members_of_ep
 
         return result
 
-    def DrawClassGraph(self):
-        data = self.IntentSearch(
-            self.Settings.MainPoint
-            if self.Settings.MainPoint
-            else self.Apk.GetMainActivityName()
+    def draw_class_graph(self) -> dict:
+        """Return dict graph"""
+        data = self.intent_search(
+            self.settings.main_point
+            if self.settings.main_point
+            else self.apk.get_main_activity_name()
         )
 
         return data
 
-    def Start(self):
-        if self.Settings.FunctionsGraph:
-            data = self.FunctionSearch(
-                self.Settings.MainPoint
-                if self.Settings.MainPoint
-                else self.Apk.GetMainActivityName()
+    def start(self):
+        """Start analyzing apk"""
+        if self.settings.functions_graph:
+            data = self.function_search(
+                self.settings.main_point
+                if self.settings.main_point
+                else self.apk.mainactivity_name,
+                depth_number=0,
+                analyzed_class=[],
+                previous_function_calls=[],
             )
 
-        if self.Settings.IntentsGraph:
-            data = self.IntentSearch(
-                self.Settings.MainPoint
-                if self.Settings.MainPoint
-                else self.Apk.GetMainActivityName()
+        if self.settings.intents_graph:
+            data = self.intent_search(
+                self.settings.main_point
+                if self.settings.main_point
+                else self.apk.mainactivity_name,
+                depth_number=0,
+                analyzed_class=[],
             )
 
-        with open(f"{self.Settings.Output}.json", "w", encoding="utf-8") as f:
+        with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
