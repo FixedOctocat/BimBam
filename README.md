@@ -31,3 +31,27 @@ options:
                         Directory for apktool
   --pyvis               Generate interactive graph
 ```
+
+## Output
+```
+[
+    {
+        "Name": "MainActivity",
+        "members": [
+            {
+                "Name": "MedalStoreHomeActivity",
+                "members": []
+            },
+            {
+                "Name": "WorkoutPlanActivity",
+                "members": [
+                    {
+                        "Name": "CardioWorkoutService",
+                        "members": [
+                            {
+                                "Name": "DummyActivity",
+                                "members": []
+                            }
+                        ]
+                    },
+```
