@@ -68,4 +68,7 @@ class Apk:
             else:
                 self.other_activities.append(activity_name)
 
-        self.other_activities.remove(self.mainactivity_name)
+        try:
+            self.exported_activities.remove(self.mainactivity_name)
+        except ValueError:
+            self.other_activities.remove(self.mainactivity_name)
