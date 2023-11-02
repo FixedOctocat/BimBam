@@ -100,7 +100,7 @@ class Analyzer:
                     encoding="utf-8",
                 ).read()
             except FileNotFoundError:
-                print("Can't find class")
+                print(f"Can't find class: {start_point}")
                 result["members"] = members_of_ep
                 return result
 
