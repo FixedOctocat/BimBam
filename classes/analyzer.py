@@ -46,12 +46,16 @@ class Analyzer:
         depth_number: int = 0,
         analyzed_class: list = None,
         previous_function_calls: list = None,
+        color: str = "#97c2fc",
     ) -> dict:
         """Search function calls"""
         result = {
             "Name": f"{start_point.split('.')[-1]}",
             "members": "",
         }
+
+        if self.settings.pyvis:
+            result["color"] = color
 
         if not self.settings.recursive:
             if start_point in analyzed_class:
@@ -143,12 +147,16 @@ class Analyzer:
         start_point: str = None,
         depth_number: int = 0,
         analyzed_class: list = None,
+        color: str = "#97c2fc",
     ) -> dict:
         """Intent search in activities"""
         result = {
             "Name": "",
             "members": "",
         }
+
+        if self.settings.pyvis:
+            result["color"] = color
 
         if not self.settings.recursive:
             if start_point in analyzed_class:
@@ -211,33 +219,45 @@ class Analyzer:
 
     def start(self, data: dict = None):
         """Start analyzing apk"""
-        activities = [self.apk.mainactivity_name]
+        activities = {}
+        activities["MainActivity"] = [self.apk.mainactivity_name]
         if self.settings.all_activities:
-            activities += self.apk.other_activities + self.apk.exported_activities
+            activities["Exported"] = self.apk.exported_activities
+            activities["Other"] = self.apk.other_activities
         elif self.settings.exported:
-            activities += self.apk.exported_activities
+            activities["Exported"] = self.apk.exported_activities
+
+        colors = {
+            "MainActivity": "#fc97bc",
+            "Exported": "#fcc897",
+            "Other": "#97c2fc",
+        }
 
         data = []
         if self.settings.functions_graph:
-            for activity in activities:
-                data.append(
-                    self.function_search(
-                        activity,
-                        depth_number=0,
-                        analyzed_class=[],
-                        previous_function_calls=[],
+            for activity_type, activity_names in activities.items():
+                for activity in activity_names:
+                    data.append(
+                        self.function_search(
+                            activity,
+                            depth_number=0,
+                            analyzed_class=[],
+                            previous_function_calls=[],
+                            color=colors[activity_type],
+                        )
                     )
-                )
 
         if self.settings.intents_graph:
-            for activity in activities:
-                data.append(
-                    self.intent_search(
-                        activity,
-                        depth_number=0,
-                        analyzed_class=[],
+            for activity_type, activity_names in activities.items():
+                for activity in activity_names:
+                    data.append(
+                        self.intent_search(
+                            activity,
+                            depth_number=0,
+                            analyzed_class=[],
+                            color=colors[activity_type],
+                        )
                     )
-                )
 
         if data:
             with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:

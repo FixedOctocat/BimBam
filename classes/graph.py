@@ -23,6 +23,10 @@ class Graph:
         """Create node"""
         if node not in self.net.get_nodes():
             self.net.add_node(node, shape="box", level=level, color=color)
+        elif color == "#fcc897":
+            self.net.nodes[list(map(lambda x: x["id"], self.net.nodes)).index(node)][
+                "color"
+            ] = "#fcc897"
 
     def show(self):
         """Show graph"""
@@ -33,9 +37,11 @@ class Graph:
         """Get json to analyze and draw graph"""
 
         if start_point["members"]:
-            self.add_node(start_point["Name"], level=level)
+            self.add_node(start_point["Name"], level=level, color=start_point["color"])
             for activity_name in start_point["members"]:
-                self.add_node(activity_name["Name"], level=level + 1)
+                self.add_node(
+                    activity_name["Name"], level=level + 1, color=activity_name["color"]
+                )
                 self.add_connection(start_point["Name"], activity_name["Name"])
 
             if start_point["members"]:
