@@ -22,7 +22,14 @@ class Graph:
     def add_node(self, node: str, level: int, color: str = "#97c2fc"):
         """Create node"""
         if node not in self.net.get_nodes():
-            self.net.add_node(node, shape="box", level=level, color=color)
+            self.net.add_node(
+                node,
+                shape="box",
+                level=level,
+                color=color,
+                label=node.split(".")[-1],
+                title=node,
+            )
         elif color == "#fcc897":
             self.net.nodes[list(map(lambda x: x["id"], self.net.nodes)).index(node)][
                 "color"

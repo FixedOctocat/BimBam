@@ -50,7 +50,7 @@ class Analyzer:
     ) -> dict:
         """Search function calls"""
         result = {
-            "Name": f"{start_point.split('.')[-1]}",
+            "Name": f"{start_point}",
             "members": "",
         }
 
@@ -202,7 +202,7 @@ class Analyzer:
                 if ep:
                     members_of_ep.append(ep)
 
-        result["Name"] = f"{start_point.split('.')[-1]}"
+        result["Name"] = f"{start_point}"
         result["members"] = members_of_ep
 
         return result
