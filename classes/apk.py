@@ -76,13 +76,18 @@ class AndroidManifest:
             if exported:
                 intent_filters = activity.find_all("intent-filter")
 
-                if "android.intent.action.MAIN" in [
-                    intent.find("action")["android:name"] for intent in intent_filters
-                ] and "android.intent.category.LAUNCHER" in [
-                    intent.find("category")["android:name"] for intent in intent_filters
-                ]:
-                    self.mainactivities.append(activity["android:name"])
-                else:
+                try:
+                    if "android.intent.action.MAIN" in [
+                        intent.find("action").get("android:name")
+                        for intent in intent_filters
+                    ] and "android.intent.category.LAUNCHER" in [
+                        intent.find("category").get("android:name")
+                        for intent in intent_filters
+                    ]:
+                        self.mainactivities.append(activity["android:name"])
+                    else:
+                        self.exported_activities.append(activity["android:name"])
+                except AttributeError:
                     self.exported_activities.append(activity["android:name"])
             else:
                 self.other_activities.append(activity["android:name"])
