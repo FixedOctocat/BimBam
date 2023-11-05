@@ -30,10 +30,10 @@ class Graph:
                 label=node.split(".")[-1],
                 title=node,
             )
-        elif color == "#fcc897":
+        elif color in ["#fcc897", "#fc97bc"]:
             self.net.nodes[list(map(lambda x: x["id"], self.net.nodes)).index(node)][
                 "color"
-            ] = "#fcc897"
+            ] = color
 
     def show(self):
         """Show graph"""

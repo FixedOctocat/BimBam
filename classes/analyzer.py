@@ -221,13 +221,13 @@ class Analyzer:
         """Start analyzing apk"""
         activities = {}
 
-        if self.apk.mainactivity_name:
-            activities["MainActivity"] = [self.apk.mainactivity_name]
+        if self.apk.manifest.mainactivities:
+            activities["MainActivity"] = self.apk.manifest.mainactivities
         if self.settings.all_activities:
-            activities["Exported"] = self.apk.exported_activities
-            activities["Other"] = self.apk.other_activities
+            activities["Exported"] = self.apk.manifest.exported_activities
+            activities["Other"] = self.apk.manifest.other_activities
         elif self.settings.exported:
-            activities["Exported"] = self.apk.exported_activities
+            activities["Exported"] = self.apk.manifest.exported_activities
 
         colors = {
             "MainActivity": "#fc97bc",
