@@ -71,4 +71,9 @@ class Apk:
         try:
             self.exported_activities.remove(self.mainactivity_name)
         except ValueError:
+            pass
+
+        try:
             self.other_activities.remove(self.mainactivity_name)
+        except ValueError:
+            pass

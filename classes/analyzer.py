@@ -220,7 +220,9 @@ class Analyzer:
     def start(self, data: dict = None):
         """Start analyzing apk"""
         activities = {}
-        activities["MainActivity"] = [self.apk.mainactivity_name]
+
+        if self.apk.mainactivity_name:
+            activities["MainActivity"] = [self.apk.mainactivity_name]
         if self.settings.all_activities:
             activities["Exported"] = self.apk.exported_activities
             activities["Other"] = self.apk.other_activities
