@@ -171,36 +171,38 @@ class Analyzer:
             for dir in glob(
                 f"apktoolFolder/smali*/{'/'.join(start_point.split('.')[:-1])}"
             )
-        ][0]
-
-        first_point = open(
-            f"{activity_folder}/{start_point.split('.')[-1]}.smali",
-            "r",
-            encoding="utf-8",
-        ).read()
-
-        function_calls_from_fp = re.findall(
-            r"""const-class .*, L(.*);[\na-zA-Z0-9. ]*    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
-            first_point,
-        )
-
-        after_entry_points = [
-            i.replace("/", ".")
-            for i in function_calls_from_fp
-            if self.class_check(class_name=i, start_point=start_point)
         ]
 
         members_of_ep = []
-        if after_entry_points:
-            for i in after_entry_points:
-                ep = self.intent_search(
-                    i,
-                    depth_number=depth_number + 1,
-                    analyzed_class=analyzed_class,
-                )
+        if activity_folder:
+            activity_folder = activity_folder[0]
+            first_point = open(
+                f"{activity_folder}/{start_point.split('.')[-1]}.smali",
+                "r",
+                encoding="utf-8",
+            ).read()
 
-                if ep:
-                    members_of_ep.append(ep)
+            function_calls_from_fp = re.findall(
+                r"""const-class .*, L(.*);[\na-zA-Z0-9. ]*    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
+                first_point,
+            )
+
+            after_entry_points = [
+                i.replace("/", ".")
+                for i in function_calls_from_fp
+                if self.class_check(class_name=i, start_point=start_point)
+            ]
+
+            if after_entry_points:
+                for i in after_entry_points:
+                    ep = self.intent_search(
+                        i,
+                        depth_number=depth_number + 1,
+                        analyzed_class=analyzed_class,
+                    )
+
+                    if ep:
+                        members_of_ep.append(ep)
 
         result["Name"] = f"{start_point}"
         result["members"] = members_of_ep
