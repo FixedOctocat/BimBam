@@ -159,7 +159,9 @@ class Settings:
             "Draw Functions Graph": "True" if self.functions_graph else "False",
             "Draw Intents Graph": "True" if self.intents_graph else "False",
             "Main Point": self.main_point if self.main_point else "Not specified",
-            "Analyze exported activities": "True" if self.exported else "False",
+            "Analyze exported activities": "True"
+            if self.exported or self.all_activities
+            else "False",
             "Analyze all activities": "True" if self.all_activities else "False",
             "Depth": self.depth,
             "Recursive search": "True" if self.recursive else "False",
