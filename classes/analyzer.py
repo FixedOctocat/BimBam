@@ -180,7 +180,7 @@ class Analyzer:
         ).read()
 
         function_calls_from_fp = re.findall(
-            r"""const-class .*, L(.*);\n\n    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
+            r"""const-class .*, L(.*);[\na-zA-Z0-9. ]*    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
             first_point,
         )
 
