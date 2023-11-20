@@ -228,13 +228,13 @@ class CallSearch:
         """Start analyzing apk"""
         activities = {}
 
-        if self.apk.manifest.mainactivities:
-            activities["MainActivity"] = self.apk.manifest.mainactivities
+        if self.apk.manifest.activities["MainActivities"]:
+            activities["MainActivity"] = self.apk.manifest.activities["MainActivities"]
         if self.settings.all_activities:
-            activities["Exported"] = self.apk.manifest.exported_activities
-            activities["Other"] = self.apk.manifest.other_activities
+            activities["Exported"] = self.apk.manifest.activities["ExportedActivities"]
+            activities["Other"] = self.apk.manifest.activities["OtherActivities"]
         elif self.settings.exported:
-            activities["Exported"] = self.apk.manifest.exported_activities
+            activities["Exported"] = self.apk.manifest.activities["ExportedActivities"]
 
         colors = {
             "MainActivity": "#fc97bc",

@@ -45,25 +45,23 @@ class AndroidManifest:
     def __init__(self, path_to_manifest: str):
         # AndroidManifest.xml file
         self.path_to_manifest = path_to_manifest
-
         with open(self.path_to_manifest, "r", encoding="utf-8") as f:
             data = f.read()
-
         self.manifest_file = BeautifulSoup(data, "xml")
 
-        self.mainactivities = []
-        self.exported_activities = []
-        self.other_activities = []
-        self.__set_activities()
+        self.activities = {
+            "MainActivities": [],
+            "ExportedActivities": [],
+            "OtherActivities": [],
+        }
+        self.providers = {"Exported": [], "NotExported": []}
+        self.receivers = {"Exported": [], "NotExported": []}
+        self.services = {"Exported": [], "NotExported": []}
+        self.__load_components()
 
         self.permissions = self.get_permissions()
 
-        # Other useful staff
-        self.services = None
-        self.receivers = None
-        self.providers = None
-
-    def __set_activities(self):
+    def __load_components(self):
         """Save all activities"""
 
         application = self.manifest_file.find("application")
@@ -84,13 +82,52 @@ class AndroidManifest:
                         intent.find("category").get("android:name")
                         for intent in intent_filters
                     ]:
-                        self.mainactivities.append(activity["android:name"])
+                        self.activities["MainActivities"].append(
+                            activity["android:name"]
+                        )
                     else:
-                        self.exported_activities.append(activity["android:name"])
+                        self.activities["ExportedActivities"].append(
+                            activity["android:name"]
+                        )
                 except AttributeError:
-                    self.exported_activities.append(activity["android:name"])
+                    self.activities["ExportedActivities"].append(
+                        activity["android:name"]
+                    )
             else:
-                self.other_activities.append(activity["android:name"])
+                self.activities["OtherActivities"].append(activity["android:name"])
+
+        for provider in application.find_all("provider"):
+            try:
+                exported = "True" if provider["android:exported"] == "true" else "False"
+            except KeyError:
+                exported = False
+
+            if exported:
+                self.providers["Exported"] = provider.get("android:name")
+            else:
+                self.providers["NotExported"] = provider.get("android:name")
+
+        for receiver in application.find_all("receiver"):
+            try:
+                exported = "True" if receiver["android:exported"] == "true" else "False"
+            except KeyError:
+                exported = False
+
+            if exported:
+                self.receivers["Exported"] = receiver.get("android:name")
+            else:
+                self.receivers["NotExported"] = receiver.get("android:name")
+
+        for receiver in application.find_all("receiver"):
+            try:
+                exported = "True" if receiver["android:exported"] == "true" else "False"
+            except KeyError:
+                exported = False
+
+            if exported:
+                self.receivers["Exported"] = receiver.get("android:name")
+            else:
+                self.activities["NotExported"] = receiver.get("android:name")
 
     def get_permissions(self) -> list:
         """Grab permissions from AndroidManifest.xml"""
