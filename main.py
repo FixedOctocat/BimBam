@@ -1,7 +1,7 @@
 """Import classes"""
 from classes.apk import Apk
 from classes.settings import Settings
-from classes.analyzer import CallSearch
+from classes.analyzer import CallSearch, BaseInformation
 from classes.graph import Graph
 
 if __name__ == "__main__":
@@ -11,6 +11,8 @@ if __name__ == "__main__":
     ProgramSettings.print_settings()
 
     ApkFile = Apk(ProgramSettings.apk_path)
+    ApkInfo = BaseInformation(ApkFile, ProgramSettings)
+    ApkInfo.get_attack_surface()
 
     if ProgramSettings.functions_graph or ProgramSettings.intents_graph:
         AnalyzerTool = CallSearch(ApkFile, ProgramSettings)

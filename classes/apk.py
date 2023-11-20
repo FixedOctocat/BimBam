@@ -97,37 +97,28 @@ class AndroidManifest:
                 self.activities["OtherActivities"].append(activity["android:name"])
 
         for provider in application.find_all("provider"):
-            try:
-                exported = "True" if provider["android:exported"] == "true" else "False"
-            except KeyError:
-                exported = False
+            exported = provider.get("android:exported", False) == "true"
 
             if exported:
-                self.providers["Exported"] = provider.get("android:name")
+                self.providers["Exported"].append(provider.get("android:name"))
             else:
-                self.providers["NotExported"] = provider.get("android:name")
+                self.providers["NotExported"].append(provider.get("android:name"))
 
         for receiver in application.find_all("receiver"):
-            try:
-                exported = "True" if receiver["android:exported"] == "true" else "False"
-            except KeyError:
-                exported = False
+            exported = receiver.get("android:exported", False) == "true"
 
             if exported:
-                self.receivers["Exported"] = receiver.get("android:name")
+                self.receivers["Exported"].append(receiver.get("android:name"))
             else:
-                self.receivers["NotExported"] = receiver.get("android:name")
+                self.receivers["NotExported"].append(receiver.get("android:name"))
 
-        for receiver in application.find_all("receiver"):
-            try:
-                exported = "True" if receiver["android:exported"] == "true" else "False"
-            except KeyError:
-                exported = False
+        for service in application.find_all("service"):
+            exported = service.get("android:exported", False) == "true"
 
             if exported:
-                self.receivers["Exported"] = receiver.get("android:name")
+                self.services["Exported"].append(service.get("android:name"))
             else:
-                self.activities["NotExported"] = receiver.get("android:name")
+                self.services["NotExported"].append(service.get("android:name"))
 
     def get_permissions(self) -> list:
         """Grab permissions from AndroidManifest.xml"""

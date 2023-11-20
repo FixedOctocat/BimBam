@@ -271,3 +271,28 @@ class CallSearch:
         if data:
             with open(f"{self.settings.output}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f, ensure_ascii=False, indent=4)
+
+
+class BaseInformation:
+    """Get attack surface from AndroidManifest.xml"""
+
+    def __init__(self, apk, settings):
+        self.apk = apk
+        self.settings = settings
+
+    def get_attack_surface(self):
+        """Print information about apk"""
+        print()
+        print(f"Package name: {self.apk.package_name}")
+        print(
+            f"{len(self.apk.manifest.activities['MainActivities']) + len(self.apk.manifest.activities['ExportedActivities']) + len(self.apk.manifest.activities['OtherActivities'])} activities:\n\t{len(self.apk.manifest.activities['MainActivities'])} MainActivities\n\t{len(self.apk.manifest.activities['ExportedActivities'])} exported\n\t{len(self.apk.manifest.activities['OtherActivities'])} other activities"
+        )
+        print(
+            f"{len(self.apk.manifest.providers['Exported']) + len(self.apk.manifest.providers['NotExported'])} providers:\n\t{len(self.apk.manifest.providers['Exported'])} expoted\n\t{len(self.apk.manifest.providers['NotExported'])} not exported"
+        )
+        print(
+            f"{len(self.apk.manifest.receivers['Exported']) + len(self.apk.manifest.receivers['NotExported'])} receivers:\n\t{len(self.apk.manifest.receivers['Exported'])} expoted\n\t{len(self.apk.manifest.receivers['NotExported'])} not exported"
+        )
+        print(
+            f"{len(self.apk.manifest.services['Exported']) + len(self.apk.manifest.services['NotExported'])} services:\n\t{len(self.apk.manifest.services['Exported'])} expoted\n\t{len(self.apk.manifest.services['NotExported'])} not exported"
+        )
