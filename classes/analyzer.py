@@ -176,11 +176,16 @@ class Analyzer:
         members_of_ep = []
         if activity_folder:
             activity_folder = activity_folder[0]
-            first_point = open(
-                f"{activity_folder}/{start_point.split('.')[-1]}.smali",
-                "r",
-                encoding="utf-8",
-            ).read()
+            try:
+                first_point = open(
+                    f"{activity_folder}/{start_point.split('.')[-1]}.smali",
+                    "r",
+                    encoding="utf-8",
+                ).read()
+            except FileNotFoundError:
+                print(f"Can't find class: {start_point}")
+                result["members"] = members_of_ep
+                return result
 
             function_calls_from_fp = re.findall(
                 r"""const-class .*, L(.*);[\na-zA-Z0-9. ]*    invoke-direct {.*}, Landroid\/content\/Intent;-><init>\(Landroid\/content\/Context;Ljava\/lang\/Class;\)V""",
