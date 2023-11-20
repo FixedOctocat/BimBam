@@ -285,14 +285,43 @@ class BaseInformation:
         print()
         print(f"Package name: {self.apk.package_name}")
         print(
-            f"{len(self.apk.manifest.activities['MainActivities']) + len(self.apk.manifest.activities['ExportedActivities']) + len(self.apk.manifest.activities['OtherActivities'])} activities:\n\t{len(self.apk.manifest.activities['MainActivities'])} MainActivities\n\t{len(self.apk.manifest.activities['ExportedActivities'])} exported\n\t{len(self.apk.manifest.activities['OtherActivities'])} other activities"
+            f"{len(self.apk.manifest.activities['MainActivities']) + len(self.apk.manifest.activities['ExportedActivities']) + len(self.apk.manifest.activities['OtherActivities'])} activities:"
         )
+        print(f"\t{len(self.apk.manifest.activities['MainActivities'])} MainActivities")
+        for i in self.apk.manifest.activities["MainActivities"]:
+            print(f"\t\t{i}")
+        print(f"\t{len(self.apk.manifest.activities['ExportedActivities'])} exported")
+        for i in self.apk.manifest.activities["ExportedActivities"]:
+            print(f"\t\t{i}")
         print(
-            f"{len(self.apk.manifest.providers['Exported']) + len(self.apk.manifest.providers['NotExported'])} providers:\n\t{len(self.apk.manifest.providers['Exported'])} expoted\n\t{len(self.apk.manifest.providers['NotExported'])} not exported"
+            f"\t{len(self.apk.manifest.activities['OtherActivities'])} other activities"
         )
+        for i in self.apk.manifest.activities["OtherActivities"]:
+            print(f"\t\t{i}")
         print(
-            f"{len(self.apk.manifest.receivers['Exported']) + len(self.apk.manifest.receivers['NotExported'])} receivers:\n\t{len(self.apk.manifest.receivers['Exported'])} expoted\n\t{len(self.apk.manifest.receivers['NotExported'])} not exported"
+            f"{len(self.apk.manifest.providers['Exported']) + len(self.apk.manifest.providers['NotExported'])} providers:"
         )
+        print(f"\t{len(self.apk.manifest.providers['Exported'])} expoted")
+        for i in self.apk.manifest.providers["Exported"]:
+            print(f"\t\t{i}")
+        print(f"\t{len(self.apk.manifest.providers['NotExported'])} not exported")
+        for i in self.apk.manifest.providers["NotExported"]:
+            print(f"\t\t{i}")
         print(
-            f"{len(self.apk.manifest.services['Exported']) + len(self.apk.manifest.services['NotExported'])} services:\n\t{len(self.apk.manifest.services['Exported'])} expoted\n\t{len(self.apk.manifest.services['NotExported'])} not exported"
+            f"{len(self.apk.manifest.receivers['Exported']) + len(self.apk.manifest.receivers['NotExported'])} receivers:"
         )
+        print(f"\t{len(self.apk.manifest.receivers['Exported'])} expoted")
+        for i in self.apk.manifest.receivers["Exported"]:
+            print(f"\t\t{i}")
+        print(f"\t{len(self.apk.manifest.receivers['NotExported'])} not exported")
+        for i in self.apk.manifest.receivers["NotExported"]:
+            print(f"\t\t{i}")
+        print(
+            f"{len(self.apk.manifest.services['Exported']) + len(self.apk.manifest.services['NotExported'])} services:"
+        )
+        print(f"\t{len(self.apk.manifest.services['Exported'])} expoted")
+        for i in self.apk.manifest.services["Exported"]:
+            print(f"\t\t{i}")
+        print(f"\t{len(self.apk.manifest.services['NotExported'])} not exported")
+        for i in self.apk.manifest.services["NotExported"]:
+            print(f"\t\t{i}")
