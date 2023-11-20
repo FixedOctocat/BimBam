@@ -9,7 +9,7 @@ import json
 from glob import glob
 
 
-class Analyzer:
+class CallSearch:
     """Class for smali code analyze"""
 
     def __init__(self, apk, settings):
