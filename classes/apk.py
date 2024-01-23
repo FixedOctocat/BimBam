@@ -66,10 +66,7 @@ class AndroidManifest:
 
         application = self.manifest_file.find("application")
         for activity in application.find_all("activity"):
-            try:
-                exported = "True" if activity["android:exported"] == "true" else "False"
-            except KeyError:
-                exported = False
+            exported = activity.get("android:exported", False) == "true"
 
             if exported:
                 intent_filters = activity.find_all("intent-filter")
